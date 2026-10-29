@@ -1,0 +1,1261 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GTKR — Get to Know REAKSI | LPM FST UIN SGD Bandung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary-blue: #2864A8;
+  --deep-blue: #173B68;
+  --baby-pink: #F7C3D7;
+  --soft-pink: #FCE5ED;
+  --white: #FFFFFF;
+  --light-blue: #EAF4FF;
+  --ink-navy: #172B43;
+  --accent-yellow: #FFD66B;
+  --line-blue: #B5D5F5;
+  --tape-color: rgba(247, 195, 215, 0.65);
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'Courier Prime', monospace;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+  margin: 0;
+  background-color: var(--light-blue);
+  background-image: 
+    radial-gradient(var(--line-blue) 0.8px, transparent 0.8px),
+    linear-gradient(to right, rgba(40, 100, 168, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px, 40px 40px;
+  color: var(--ink-navy);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Scroll Bar & Progress Bar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--light-blue); }
+::-webkit-scrollbar-thumb { background: var(--primary-blue); border-radius: 4px; }
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(to right, var(--primary-blue), var(--baby-pink), var(--accent-yellow));
+  width: 0%;
+  z-index: 1000;
+  transition: width 0.1s ease-out;
+}
+
+/* Header & Top Navigation */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 2px solid var(--primary-blue);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px clamp(16px, 4vw, 48px);
+  box-shadow: 0 4px 20px rgba(23, 59, 104, 0.06);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--deep-blue);
+}
+.brand-badge {
+  background: var(--baby-pink);
+  color: var(--deep-blue);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--primary-blue);
+  transform: rotate(-3deg);
+}
+.nav { display: flex; gap: 20px; align-items: center; }
+.nav a {
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink-navy);
+  position: relative;
+  transition: color 0.2s;
+}
+.nav a:hover, .nav a.active { color: var(--primary-blue); }
+.nav a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--baby-pink);
+  border-radius: 2px;
+}
+.menu-btn {
+  display: none;
+  background: var(--white);
+  border: 2px solid var(--primary-blue);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 800;
+  color: var(--primary-blue);
+  cursor: pointer;
+}
+
+/* News Ticker */
+.news-ticker {
+  background: var(--deep-blue);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-bottom: 2px solid var(--primary-blue);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.ticker-title {
+  background: var(--baby-pink);
+  color: var(--deep-blue);
+  padding: 8px 16px;
+  font-weight: 900;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  border-right: 2px solid var(--primary-blue);
+  z-index: 2;
+}
+.ticker-wrap { display: flex; overflow: hidden; width: 100%; }
+.ticker-move {
+  display: flex;
+  gap: 40px;
+  white-space: nowrap;
+  padding: 8px 0;
+  animation: ticker 30s linear infinite;
+}
+@keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+/* Shared Layout Components */
+.wrap { width: min(1200px, 92vw); margin: auto; }
+.section { padding: 90px 0; position: relative; border-bottom: 1px dashed var(--line-blue); }
+.chapter-tag {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  background: var(--soft-pink);
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--baby-pink);
+  margin-bottom: 12px;
+  letter-spacing: 0.1em;
+}
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.05; margin: 0 0 16px 0; }
+h2 { font-size: clamp(2.2rem, 5vw, 3.8rem); color: var(--deep-blue); }
+.section-head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: end;
+  margin-bottom: 40px;
+}
+.section-head p { color: #4A607A; font-size: 1.05rem; margin: 0; }
+
+/* Decorative Stamps & Tapes */
+.stamp {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 2px dashed var(--primary-blue);
+  color: var(--primary-blue);
+  font-family: var(--font-mono);
+  font-weight: 900;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transform: rotate(-4deg);
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+}
+.stamp-pink { border-color: #E66B95; color: #D64273; background: var(--soft-pink); }
+.tape {
+  position: absolute;
+  width: 90px;
+  height: 26px;
+  background: var(--tape-color);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  z-index: 5;
+  pointer-events: none;
+}
+.tape-top-left { top: -12px; left: 20px; transform: rotate(-8deg); }
+.tape-top-right { top: -12px; right: 20px; transform: rotate(6deg); }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 14px 26px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 0.95rem;
+  border: 2px solid var(--primary-blue);
+  box-shadow: 4px 4px 0px var(--baby-pink);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--baby-pink);
+  background: var(--deep-blue);
+}
+.btn-alt {
+  background: var(--white);
+  color: var(--primary-blue);
+  box-shadow: 4px 4px 0px var(--primary-blue);
+}
+.btn-alt:hover {
+  background: var(--soft-pink);
+  color: var(--deep-blue);
+  box-shadow: 6px 6px 0px var(--primary-blue);
+}
+
+/* SECTION 1: HERO */
+.hero {
+  padding: 70px 0 90px;
+  background: linear-gradient(135deg, var(--white) 0%, var(--light-blue) 60%, var(--soft-pink) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  align-items: center;
+}
+.hero-masthead {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary-blue);
+  border-bottom: 2px solid var(--primary-blue);
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+.hero h1 {
+  font-size: clamp(3.2rem, 7vw, 5.5rem);
+  color: var(--deep-blue);
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
+}
+.hero h1 span.highlight {
+  color: var(--primary-blue);
+  position: relative;
+}
+.hero h1 span.highlight::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  width: 100%;
+  height: 16px;
+  background: var(--baby-pink);
+  z-index: -1;
+  opacity: 0.7;
+  transform: rotate(-1deg);
+}
+.hero p.lead {
+  font-size: 1.2rem;
+  color: var(--ink-navy);
+  margin-bottom: 30px;
+  max-width: 540px;
+}
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 30px; }
+
+/* Hero Graphic / Editorial Collage Frame */
+.hero-frame {
+  position: relative;
+  background: var(--white);
+  border: 3px solid var(--deep-blue);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 12px 12px 0px var(--baby-pink);
+  transform: rotate(1.5deg);
+}
+.hero-photo-placeholder {
+  width: 100%;
+  height: 320px;
+  background: linear-gradient(135deg, #C2DCF7, #FCE5ED);
+  border: 2px dashed var(--primary-blue);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 20px;
+}
+.hero-photo-placeholder svg { width: 54px; height: 54px; stroke: var(--primary-blue); opacity: 0.9; margin-bottom: 10px; }
+.hero-photo-placeholder h4 { margin: 0; font-family: var(--font-display); color: var(--deep-blue); font-size: 1.2rem; }
+.hero-photo-placeholder p { margin: 6px 0 0; font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary-blue); }
+
+.floating-note {
+  position: absolute;
+  bottom: -20px;
+  left: -20px;
+  background: var(--accent-yellow);
+  padding: 14px 18px;
+  border: 2px solid var(--ink-navy);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 4px 4px 0px var(--ink-navy);
+  transform: rotate(-6deg);
+  max-width: 240px;
+}
+
+/* SECTION 2: INTERACTIVE JOURNEY MAP */
+.map-container {
+  background: var(--white);
+  border: 3px solid var(--primary-blue);
+  border-radius: 24px;
+  padding: clamp(20px, 4vw, 40px);
+  box-shadow: 10px 10px 0px var(--line-blue);
+  position: relative;
+}
+.map-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 30px;
+  align-items: center;
+}
+.svg-map-wrapper { width: 100%; height: auto; position: relative; }
+.map-svg { width: 100%; height: auto; display: block; }
+.map-path-bg { stroke: var(--soft-pink); stroke-width: 14; fill: none; stroke-linecap: round; }
+.map-path-line {
+  stroke: var(--primary-blue);
+  stroke-width: 4;
+  fill: none;
+  stroke-dasharray: 8 8;
+  stroke-linecap: round;
+  animation: mapDash 25s linear infinite;
+}
+@keyframes mapDash { to { stroke-dashoffset: -300; } }
+
+.map-node { cursor: pointer; transition: transform 0.2s ease; }
+.map-node:hover, .map-node.active { transform: scale(1.15); }
+.map-node circle.outer { fill: var(--white); stroke: var(--primary-blue); stroke-width: 3; }
+.map-node.active circle.outer { fill: var(--baby-pink); stroke: var(--deep-blue); stroke-width: 4; }
+.map-node circle.inner { fill: var(--primary-blue); }
+.map-node.active circle.inner { fill: var(--deep-blue); }
+.map-node text { font-family: var(--font-mono); font-weight: 700; font-size: 13px; fill: var(--white); text-anchor: middle; dominant-baseline: central; }
+
+.map-info-card {
+  background: var(--light-blue);
+  border: 2px solid var(--primary-blue);
+  border-radius: 16px;
+  padding: 28px;
+  position: relative;
+  box-shadow: 6px 6px 0px var(--baby-pink);
+}
+.map-info-card h3 { font-size: 1.8rem; color: var(--deep-blue); margin-bottom: 10px; }
+.map-info-card p { font-size: 0.95rem; color: var(--ink-navy); margin-bottom: 20px; }
+.map-quick-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+.map-quick-links button {
+  background: var(--white);
+  border: 1px solid var(--primary-blue);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.map-quick-links button.active, .map-quick-links button:hover {
+  background: var(--primary-blue);
+  color: var(--white);
+}
+
+/* SECTION 3: MEET REAKSI */
+.about-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 40px;
+  align-items: start;
+}
+.sticky-note {
+  background: var(--soft-pink);
+  border: 2px solid var(--baby-pink);
+  border-radius: 12px;
+  padding: 24px;
+  transform: rotate(-1.5deg);
+  box-shadow: 6px 6px 0px var(--line-blue);
+  position: relative;
+}
+.sticky-note p { font-family: var(--font-mono); font-size: 0.95rem; color: var(--deep-blue); margin: 0; }
+.facts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+.fact-card {
+  background: var(--white);
+  border: 2px solid var(--line-blue);
+  border-left: 5px solid var(--primary-blue);
+  border-radius: 10px;
+  padding: 16px;
+}
+.fact-card h4 { margin: 0 0 6px; font-size: 1rem; color: var(--deep-blue); }
+.fact-card p { margin: 0; font-size: 0.85rem; color: #556B82; }
+
+/* SECTION 4 & 5: DEPARTMENTS & FIELDS */
+.dept-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.dept-card {
+  background: var(--white);
+  border: 3px solid var(--primary-blue);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 6px 6px 0px var(--baby-pink);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+  position: relative;
+}
+.dept-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 10px 10px 0px var(--baby-pink);
+}
+.dept-header {
+  padding: 20px;
+  background: var(--primary-blue);
+  color: var(--white);
+  position: relative;
+}
+.dept-card:nth-child(2) .dept-header { background: #D95383; }
+.dept-card:nth-child(3) .dept-header { background: var(--deep-blue); }
+.dept-header h3 { margin: 0; font-size: 1.5rem; color: var(--white); }
+.dept-header span { font-family: var(--font-mono); font-size: 0.75rem; opacity: 0.9; }
+.dept-body { padding: 20px; }
+.dept-body p { font-size: 0.9rem; color: var(--ink-navy); margin-bottom: 16px; }
+.field-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.field-tag {
+  background: var(--light-blue);
+  border: 1px solid var(--line-blue);
+  color: var(--deep-blue);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+/* Department Modal / Drawer */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 43, 67, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  padding: 20px;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal-content {
+  background: var(--white);
+  border: 3px solid var(--primary-blue);
+  border-radius: 20px;
+  width: min(700px, 100%);
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 32px;
+  box-shadow: 12px 12px 0px var(--baby-pink);
+  position: relative;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+.modal-overlay.active .modal-content { transform: translateY(0); }
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--soft-pink);
+  border: 2px solid var(--primary-blue);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  color: var(--primary-blue);
+  cursor: pointer;
+}
+
+/* SECTION 6 & 7: PROGRAMS & WORKS */
+.filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+.filter-btn {
+  background: var(--white);
+  border: 2px solid var(--primary-blue);
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-btn.active, .filter-btn:hover {
+  background: var(--primary-blue);
+  color: var(--white);
+  box-shadow: 3px 3px 0px var(--baby-pink);
+}
+.program-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.program-card {
+  background: var(--white);
+  border: 2px solid var(--line-blue);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 4px 4px 0px rgba(40, 100, 168, 0.08);
+  transition: transform 0.2s ease, border-color 0.2s;
+  position: relative;
+}
+.program-card:hover { transform: translateY(-3px); border-color: var(--primary-blue); }
+.program-card h3 { font-size: 1.25rem; color: var(--deep-blue); margin-bottom: 8px; }
+.program-card p { font-size: 0.9rem; color: #4A607A; margin-bottom: 12px; }
+
+/* SECTION 8: DOCUMENTATION ARCHIVE */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.polaroid {
+  background: var(--white);
+  padding: 12px 12px 24px 12px;
+  border: 2px solid var(--line-blue);
+  box-shadow: 6px 6px 0px rgba(23, 59, 104, 0.08);
+  transform: rotate(var(--rot, 0deg));
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+.polaroid:hover {
+  transform: rotate(0deg) scale(1.03);
+  box-shadow: 10px 10px 0px var(--baby-pink);
+  z-index: 10;
+}
+.polaroid-img {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, #D6E8FA, #FCE5ED);
+  border: 1px solid var(--line-blue);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--primary-blue);
+  text-align: center;
+  padding: 10px;
+}
+.polaroid-caption {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* SECTION 9 & 10: INFO HUB & JOIN */
+.info-hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.info-box {
+  background: var(--white);
+  border: 2px solid var(--primary-blue);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 6px 6px 0px var(--soft-pink);
+}
+.info-box a { color: var(--primary-blue); font-weight: 700; text-decoration: underline; }
+.join-banner {
+  background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));
+  color: var(--white);
+  border-radius: 24px;
+  padding: clamp(30px, 5vw, 60px);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 10px 10px 0px var(--baby-pink);
+}
+.join-banner h2 { color: var(--white); }
+.join-banner p { color: var(--light-blue); max-width: 600px; margin-bottom: 30px; }
+.steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 30px 0; }
+.step-item {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+}
+.step-num { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 900; color: var(--accent-yellow); }
+.step-item h4 { margin: 4px 0; color: var(--white); font-size: 0.95rem; }
+.step-item p { font-size: 0.8rem; margin: 0; color: var(--light-blue); }
+
+/* Footer */
+.footer {
+  padding: 40px 0;
+  background: var(--deep-blue);
+  color: var(--white);
+  font-size: 0.85rem;
+  border-top: 4px solid var(--baby-pink);
+}
+.footer-wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+.footer strong { color: var(--baby-pink); font-family: var(--font-display); font-size: 1.2rem; }
+
+/* Reveal Animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* Responsive Media Queries */
+@media (max-width: 900px) {
+  .hero-grid, .map-grid, .about-grid, .section-head, .info-hub-grid { grid-template-columns: 1fr; }
+  .dept-grid, .program-grid, .gallery-grid { grid-template-columns: 1fr; }
+  .steps-grid { grid-template-columns: 1fr 1fr; }
+  .nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border-bottom: 2px solid var(--primary-blue);
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  .nav.open { display: flex; }
+  .menu-btn { display: block; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="reading-progress" id="progress-bar"></div>
+
+<!-- TOPBAR NAVIGATION -->
+<header class="topbar">
+  <a href="#home" class="brand">
+    ✦ GTKR REAKSI
+    <span class="brand-badge">LPM FST UIN SGD</span>
+  </a>
+  <button class="menu-btn" id="menu-toggle" aria-label="Toggle navigation">MENU ☰</button>
+  <nav class="nav" id="nav-menu">
+    <a href="#home" class="active">Beranda</a>
+    <a href="#peta">Peta Perjalanan</a>
+    <a href="#tentang">Tentang</a>
+    <a href="#departemen">Departemen</a>
+    <a href="#program">Program Kerja</a>
+    <a href="#dokumentasi">Dokumentasi</a>
+    <a href="#info">Kontak</a>
+    <a href="#bergabung">Join Us</a>
+  </nav>
+</header>
+
+<!-- NEWS TICKER -->
+<div class="news-ticker">
+  <div class="ticker-title">STUDENT PRESS TICKER</div>
+  <div class="ticker-wrap">
+    <div class="ticker-move">
+      <span>✦ LPM REAKSI SAINTEK UIN SUNAN GUNUNG DJATI BANDUNG</span>
+      <span>✦ TUMBUH, BERKEMBANG, BERSAMA</span>
+      <span>✦ SUARA SAINS & TEKNOLOGI — REDAKSISAINTEK.COM</span>
+      <span>✦ JOURNALISM, CREATIVITY, COMMUNITY, AND STORYTELLING</span>
+      <span>✦ LPM REAKSI SAINTEK UIN SUNAN GUNUNG DJATI BANDUNG</span>
+      <span>✦ TUMBUH, BERKEMBANG, BERSAMA</span>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- SECTION 01: HERO / OPENING -->
+  <section class="hero" id="home">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="hero-masthead">
+          <span>PORTAL EDITORIAL MAHASISWA</span>
+          <span>FST UIN SGD BANDUNG</span>
+        </div>
+        <h1>Every Story<br><span class="highlight">Has a Voice.</span></h1>
+        <p class="lead">Selamat datang di <strong>GTKR (Get to Know REAKSI)</strong> — website pengenalan interaktif Lembaga Pers Mahasiswa REAKSI, Badan Semiotonom di bawah DEMA Fakultas Sains dan Teknologi UIN Sunan Gunung Djati Bandung.</p>
+        <div class="hero-actions">
+          <a href="#peta" class="btn">Mulai Jelajah Peta ↓</a>
+          <a href="https://redaksisaintek.com/" target="_blank" rel="noopener" class="btn btn-alt">Baca RedaksiSaintek.com ↗</a>
+        </div>
+        <div class="stamp">STUDENT PRESS EDITION · TUMBUH BERKEMBANG BERSAMA</div>
+      </div>
+      <div>
+        <div class="hero-frame">
+          <div class="tape tape-top-left"></div>
+          <div class="tape tape-top-right"></div>
+          <div class="hero-photo-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
+              <path d="M18 14h-8"></path>
+              <path d="M15 18h-5"></path>
+              <path d="M10 6h8v4h-8z"></path>
+            </svg>
+            <h4>LPM REAKSI SAINTEK</h4>
+            <p>Ruang pers, ide, karya, dan wadah bertumbuh mahasiswa Saintek UIN Bandung.</p>
+          </div>
+          <div class="floating-note">
+            📌 "Mengolah gagasan menjadi karya, menyuarakan perspektif mahasiswa."
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 02: INTERACTIVE JOURNEY MAP -->
+  <section class="section" id="peta">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <span class="chapter-tag">CHAPTER 00 / NAVIGATION</span>
+          <h2>Interactive Journey Map</h2>
+        </div>
+        <p>Jelajahi perjalanan REAKSI titik demi titik untuk mengenal struktur, aktivitas, karya, dan cara bergabung.</p>
+      </div>
+
+      <div class="map-container reveal">
+        <div class="map-grid">
+          <div class="svg-map-wrapper">
+            <svg class="map-svg" viewBox="0 0 500 320">
+              <path class="map-path-bg" d="M 50,60 C 180,20 140,160 250,140 C 360,120 340,240 450,260" />
+              <path class="map-path-line" d="M 50,60 C 180,20 140,160 250,140 C 360,120 340,240 450,260" />
+
+              <!-- Node 1 -->
+              <g class="map-node active" data-stop="0" transform="translate(50, 60)" onclick="setMapStop(0)">
+                <circle class="outer" r="22" />
+                <circle class="inner" r="14" />
+                <text>1</text>
+              </g>
+              <!-- Node 2 -->
+              <g class="map-node" data-stop="1" transform="translate(180, 80)" onclick="setMapStop(1)">
+                <circle class="outer" r="22" />
+                <circle class="inner" r="14" />
+                <text>2</text>
+              </g>
+              <!-- Node 3 -->
+              <g class="map-node" data-stop="2" transform="translate(250, 140)" onclick="setMapStop(2)">
+                <circle class="outer" r="22" />
+                <circle class="inner" r="14" />
+                <text>3</text>
+              </g>
+              <!-- Node 4 -->
+              <g class="map-node" data-stop="3" transform="translate(340, 190)" onclick="setMapStop(3)">
+                <circle class="outer" r="22" />
+                <circle class="inner" r="14" />
+                <text>4</text>
+              </g>
+              <!-- Node 5 -->
+              <g class="map-node" data-stop="4" transform="translate(450, 260)" onclick="setMapStop(4)">
+                <circle class="outer" r="22" />
+                <circle class="inner" r="14" />
+                <text>5</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="map-info-card" id="map-info">
+            <span class="stamp stamp-pink" id="map-step-label">DESTINATION 01</span>
+            <h3 id="map-title" style="margin-top: 12px;">Meet REAKSI</h3>
+            <p id="map-desc">Kenali identitas dasar, posisi organisasi, serta peran LPM REAKSI di Fakultas Sains dan Teknologi UIN Sunan Gunung Djati Bandung.</p>
+            <a href="#tentang" class="btn" id="map-btn">Menuju Section →</a>
+
+            <div class="map-quick-links">
+              <button class="active" onclick="setMapStop(0)">1. Meet REAKSI</button>
+              <button onclick="setMapStop(1)">2. Root & Values</button>
+              <button onclick="setMapStop(2)">3. Departments</button>
+              <button onclick="setMapStop(3)">4. Works</button>
+              <button onclick="setMapStop(4)">5. Join Us</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 03: MEET REAKSI -->
+  <section class="section" id="tentang">
+    <div class="wrap">
+      <div class="about-grid reveal">
+        <div>
+          <span class="chapter-tag">CHAPTER 01 / IDENTITY</span>
+          <h2>So, What Is REAKSI?</h2>
+          <div class="sticky-note">
+            <p><strong>LPM REAKSI Saintek</strong> adalah Lembaga Pers Mahasiswa di bawah naungan Dewan Eksekutif Mahasiswa (DEMA) Fakultas Sains dan Teknologi UIN Sunan Gunung Djati Bandung. Lahir dari komitmen menyuarakan aspirasi dan berita berkualitas seputar dunia sains, teknologi, dan kemahasiswaan.</p>
+          </div>
+        </div>
+        <div>
+          <p>Dengan mengusung moto <em>"Tumbuh, Berkembang, Bersama"</em>, REAKSI memposisikan diri sebagai wadah pembelajaran pers mahasiswa yang independen, kritis, edukatif, dan kreatif.</p>
+
+          <div class="facts-grid">
+            <div class="fact-card">
+              <h4>Kedudukan Legal</h4>
+              <p>Badan Semiotonom di bawah DEMA FST UIN SGD Bandung berdasarkan SK Kepengurusan.</p>
+            </div>
+            <div class="fact-card">
+              <h4>Prinsip Pemberitaan</h4>
+              <p>Mengacu pada Pedoman Pemberitaan Media Siber dan kode etik jurnalistik mahasiswa.</p>
+            </div>
+            <div class="fact-card">
+              <h4>Kanal Publikasi</h4>
+              <p>Portal Utama RedaksiSaintek.com, E-Paper Tabloid, Instagram, dan YouTube.</p>
+            </div>
+            <div class="fact-card">
+              <h4>Fokus Pemberitaan</h4>
+              <p>Isu kampus FST, inovasi sains & teknologi, dikusi publik, dan karya mahasiswa.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 04 & 05: DEPARTMENTS & FIELDS -->
+  <section class="section" id="departemen">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <span class="chapter-tag">CHAPTER 02 / STRUCTURE</span>
+          <h2>One Organization, Three Departments.</h2>
+        </div>
+        <p>REAKSI digerakkan oleh tiga departemen utama yang saling bersinergi. Klik kartu di bawah untuk membuka rincian tugas dan divisinya.</p>
+      </div>
+
+      <div class="dept-grid reveal">
+        <!-- Pimred -->
+        <div class="dept-card" onclick="openDeptModal('pimred')">
+          <div class="dept-header">
+            <h3>Pimred</h3>
+            <span>Penerbitan & Redaktur</span>
+          </div>
+          <div class="dept-body">
+            <p>Dapur pacu utama produksi berita, artikel, majalah/tabloid digital, dan konten multimedia di bawah meja redaksi.</p>
+            <div class="field-tags">
+              <span class="field-tag">Layouter</span>
+              <span class="field-tag">FnV (Fotografi & Videografi)</span>
+              <span class="field-tag">Redaktur</span>
+              <span class="field-tag">Reporter</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Litbang -->
+        <div class="dept-card" onclick="openDeptModal('litbang')">
+          <div class="dept-header">
+            <h3>Litbang</h3>
+            <span>Penelitian & Pengembangan</span>
+          </div>
+          <div class="dept-body">
+            <p>Pusat riset isu kemahasiswaan, kajian sains, serta peningkatan kapasitas SDM dan keanggotaan REAKSI.</p>
+            <div class="field-tags">
+              <span class="field-tag">Riset</span>
+              <span class="field-tag">PSDM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Markom -->
+        <div class="dept-card" onclick="openDeptModal('markom')">
+          <div class="dept-header">
+            <h3>Markom</h3>
+            <span>Marketing & Komunikasi</span>
+          </div>
+          <div class="dept-body">
+            <p>Garda depan hubungan masyarakat, manajemen media partner, promosi digital, dan branding organisasi.</p>
+            <div class="field-tags">
+              <span class="field-tag">Marketing</span>
+              <span class="field-tag">Komunikasi</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 06 & 07: PROGRAM KERJA & WORKS -->
+  <section class="section" id="program">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <span class="chapter-tag">CHAPTER 03 / ACTIVITIES</span>
+          <h2>From Ideas to Impact.</h2>
+        </div>
+        <p>Program kerja dan luaran nyata yang dipersembahkan LPM REAKSI untuk sivitas akademika FST UIN SGD Bandung.</p>
+      </div>
+
+      <div class="filter-bar reveal">
+        <button class="filter-btn active" onclick="filterPrograms('all', this)">Semua Program</button>
+        <button class="filter-btn" onclick="filterPrograms('pimred', this)">Pimred</button>
+        <button class="filter-btn" onclick="filterPrograms('litbang', this)">Litbang</button>
+        <button class="filter-btn" onclick="filterPrograms('markom', this)">Markom</button>
+      </div>
+
+      <div class="program-grid reveal">
+        <div class="program-card" data-dept="pimred">
+          <span class="stamp">PIMRED</span>
+          <h3 style="margin-top: 10px;">Pengelolaan Portal RedaksiSaintek.com</h3>
+          <p>Penerbitan berita harian, opini, advertorial, dan artikel sains terupdate secara mandiri oleh tim reporter dan redaktur.</p>
+          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary-blue);">
+            ✓ Luaran: Publikasi aktif harian di redaksisaintek.com
+          </div>
+        </div>
+
+        <div class="program-card" data-dept="pimred">
+          <span class="stamp stamp-pink">PIMRED</span>
+          <h3 style="margin-top: 10px;">E-Paper & Tabloid Digital REAKSI</h3>
+          <p>Penerbitan majalah dan buletin berkala dalam format PDF interaktif yang dapat dibaca dan diunduh oleh publik.</p>
+          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary-blue);">
+            ✓ Luaran: Buletin, Tabloid Investigasi & E-Paper Digital
+          </div>
+        </div>
+
+        <div class="program-card" data-dept="litbang">
+          <span class="stamp">LITBANG</span>
+          <h3 style="margin-top: 10px;">Pelatihan Jurnalistik Tingkat Dasar (PJTD)</h3>
+          <p>Program rekrutmen dan pembekalan materi pers, penulisan berita, fotografi, serta etika jurnalistik untuk calon anggota baru.</p>
+          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary-blue);">
+            ✓ Luaran: Kader persma FST yang tersertifikasi internal
+          </div>
+        </div>
+
+        <div class="program-card" data-dept="markom">
+          <span class="stamp stamp-pink">MARKOM</span>
+          <h3 style="margin-top: 10px;">Media Partner & SOP Kerjasama</h3>
+          <p>Layanan publikasi poster acara, webinar, dan info event organisasi mahasiswa FST melalui jaringan media REAKSI.</p>
+          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary-blue);">
+            ✓ Luaran: Publikasi Instagram @lpmreaksi_ & Broadcast
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 08: DOCUMENTATION ARCHIVE -->
+  <section class="section" id="dokumentasi">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <span class="chapter-tag">CHAPTER 04 / ARCHIVE</span>
+          <h2>Real Stories. Real Memories.</h2>
+        </div>
+        <p>Arsip momen perjalanan kerja, proses kreatif, dan liputan lapangan anggota LPM REAKSI.</p>
+      </div>
+
+      <div class="gallery-grid reveal">
+        <div class="polaroid" style="--rot: -2deg;" onclick="openLightbox('Liputan Lapangan Redaksi', 'Reporter dan tim FnV saat meliput kegiatan serta wawancara isu di lingkungan FST UIN Bandung.')">
+          <div class="polaroid-img">
+            📷 
+            <strong>Liputan Lapangan</strong>
+            <span>Tim FnV & Reporter</span>
+          </div>
+          <div class="polaroid-caption">Liputan Khusus Kampus</div>
+        </div>
+
+        <div class="polaroid" style="--rot: 3deg;" onclick="openLightbox('Produksi Konten Labirin Kampus', 'Proses pengambilan gambar cinematografi dan audio recording program Labirin Kampus REAKSI.')">
+          <div class="polaroid-img">
+            🎬 
+            <strong>Labirin Kampus</strong>
+            <span>Produksi YouTube REAKSI</span>
+          </div>
+          <div class="polaroid-caption">Sinematografi & YouTube</div>
+        </div>
+
+        <div class="polaroid" style="--rot: -1.5deg;" onclick="openLightbox('Diskusi Redaksi & Layoting', 'Sesi penyuntingan berita dan penyusunan desain tata letak majalah digital REAKSI.')">
+          <div class="polaroid-img">
+            💻 
+            <strong>Meja Redaksi</strong>
+            <span>Layouter & Redaktur</span>
+          </div>
+          <div class="polaroid-caption">Layout & E-Paper</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 09: INFORMATION HUB -->
+  <section class="section" id="info">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <span class="chapter-tag">CHAPTER 05 / CONTACT</span>
+          <h2>REAKSI Information Hub</h2>
+        </div>
+        <p>Hubungi redaksi, ajukan media partner, atau ikuti rilisan artikel terbaru melalui kanal resmi kami.</p>
+      </div>
+
+      <div class="info-hub-grid reveal">
+        <div class="info-box">
+          <h3>Kanal Resmi & Media Sosial</h3>
+          <p>Terhubung langsung dengan tim redaksi dan ikuti pembaruan berita harian:</p>
+          <ul style="list-style: none; padding: 0; font-family: var(--font-mono); font-size: 0.9rem; line-height: 2;">
+            <li>🌐 <strong>Website Resmi:</strong> <a href="https://redaksisaintek.com/" target="_blank" rel="noopener">redaksisaintek.com</a></li>
+            <li>📸 <strong>Instagram:</strong> <a href="https://instagram.com/lpmreaksi_" target="_blank" rel="noopener">@lpmreaksi_</a></li>
+            <li>🎥 <strong>YouTube:</strong> <a href="https://youtube.com/@lpmreaksi" target="_blank" rel="noopener">LPM REAKSI</a></li>
+            <li>✉️ <strong>Email Redaksi:</strong> <a href="mailto:reaksisaintek@gmail.com">reaksisaintek@gmail.com</a></li>
+          </ul>
+        </div>
+
+        <div class="info-box">
+          <h3>Sekretariat Organisasi</h3>
+          <p>Gedung Kemahasiswaan (Student Center) Fakultas Sains dan Teknologi UIN Sunan Gunung Djati Bandung.</p>
+          <div style="background: var(--light-blue); padding: 16px; border-radius: 10px; border: 1px solid var(--line-blue); font-family: var(--font-mono); font-size: 0.85rem;">
+            📍 <strong>Alamat Lengkap:</strong><br>
+            Jl. A.H. Nasution No. 105, Cipadung, Kec. Cibiru, Kota Bandung, Jawa Barat 40614.<br>
+            <em>Akses terbuka untuk diskusi persma dan pengajuan media partner.</em>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 10: JOIN REAKSI -->
+  <section class="section" id="bergabung" style="border-bottom: none;">
+    <div class="wrap">
+      <div class="join-banner reveal">
+        <span class="stamp stamp-pink" style="margin-bottom: 12px;">OPEN RECRUITMENT REAKSI</span>
+        <h2>Your Story Starts Here.</h2>
+        <p>Tertarik mengasah kemampuan menulis berita, fotografi, videografi, riset, hingga manajemen media digital? Jadilah bagian dari Lembaga Pers Mahasiswa REAKSI FST UIN SGD Bandung!</p>
+
+        <div class="steps-grid">
+          <div class="step-item">
+            <div class="step-num">01</div>
+            <h4>Pendaftaran Online</h4>
+            <p>Mengisi formulir calon anggota aktif FST UIN Bandung.</p>
+          </div>
+          <div class="step-item">
+            <div class="step-num">02</div>
+            <h4>Screning & Wawancara</h4>
+            <p>Mengenal minat divisi (Pimred, Litbang, atau Markom).</p>
+          </div>
+          <div class="step-item">
+            <div class="step-num">03</div>
+            <h4>PJTD & Pembekalan</h4>
+            <p>Menerima materi persma, jurnalistik dasar, & etika media.</p>
+          </div>
+          <div class="step-item">
+            <div class="step-num">04</div>
+            <h4>Pengukuhan Anggota</h4>
+            <p>Magang redaksi dan resmi menjadi jurnalis muda REAKSI.</p>
+          </div>
+        </div>
+
+        <div class="hero-actions" style="margin-top: 30px;">
+          <a href="https://redaksisaintek.com/" target="_blank" rel="noopener" class="btn btn-alt">Kunjungi Portal Resmi & Pendaftaran ↗</a>
+          <a href="#home" class="btn">Kembali ke Atas ↑</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL POPUP UNTUK DEPARTEMEN -->
+<div class="modal-overlay" id="dept-modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeDeptModal()">✕</button>
+    <div id="modal-body-content"></div>
+  </div>
+</div>
+
+<!-- MODAL LIGHTBOX FOTO -->
+<div class="modal-overlay" id="photo-modal">
+  <div class="modal-content" style="text-align: center;">
+    <button class="modal-close" onclick="closePhotoModal()">✕</button>
+    <h3 id="photo-modal-title" style="color: var(--deep-blue); margin-bottom: 10px;"></h3>
+    <p id="photo-modal-desc" style="color: var(--ink-navy); font-size: 0.95rem;"></p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap footer-wrap">
+    <div>
+      <strong>✦ LPM REAKSI SAINTEK</strong>
+      <p style="margin: 6px 0 0; color: var(--light-blue);">Fakultas Sains dan Teknologi UIN Sunan Gunung Djati Bandung.</p>
+    </div>
+    <div style="text-align: right; font-family: var(--font-mono); font-size: 0.8rem;">
+      <p style="margin: 0;">Tumbuh, Berkembang, Bersama.</p>
+      <p style="margin: 4px 0 0; color: var(--baby-pink);">© LPM REAKSI. All Rights Reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Data Detail Departemen
+const deptDetails = {
+  pimred: {
+    title: "Departemen Pimred (Penerbitan & Redaktur)",
+    desc: "Departemen yang memegang kendali atas ruang redaksi, penerbitan media cetak/digital, serta produksi konten audio visual LPM REAKSI.",
+    fields: [
+      { name: "Reporter", task: "Melakukan liputan wawancara, penyusunan naskah berita, dan investigasi isu kampus." },
+      { name: "Redaktur", task: "Menyunting naskah liputan, menjaga etika jurnalistik, dan mengatur agenda penerbitan." },
+      { name: "Layouter", task: "Merancang tata letak visual majalah, e-paper, majalah dinding, dan desain postingan." },
+      { name: "FnV (Fotografi & Videografi)", task: "Mengambil dokumentasi jurnalistik, produksi video berita, serta program YouTube Labirin Kampus." }
+    ]
+  },
+  litbang: {
+    title: "Departemen Litbang (Penelitian & Pengembangan)",
+    desc: "Departemen yang fokus pada riset internal/eksternal, pengolahan data kajian, serta pembinaan kapasitas SDM anggota REAKSI.",
+    fields: [
+      { name: "Riset", task: "Menyusun kuesioner survei mahasiswa, riset opini publik, dan analisis isu sains terkini." },
+      { name: "PSDM", task: "Mengelola Pelatihan Jurnalistik Tingkat Dasar (PJTD), alur kaderisasi, dan keakraban internal." }
+    ]
+  },
+  markom: {
+    title: "Departemen Markom (Marketing & Komunikasi)",
+    desc: "Departemen yang membangun hubungan luar, kemitraan media, promosi portal, serta komunikasi publik.",
+    fields: [
+      { name: "Marketing", task: "Mengelola skema SOP Media Partner, sponsorship, dan pendanaan kreatif persma." },
+      { name: "Komunikasi", task: "Memegang akun resmi Instagram, TikTok, broadcast channel, dan humas antar-lembaga." }
+    ]
+  }
+};
+
+// Data Peta Perjalanan
+const mapStops = [
+  { step: "DESTINATION 01", title: "Meet REAKSI", desc: "Kenali identitas dasar, posisi organisasi, serta peran LPM REAKSI di Fakultas Sains dan Teknologi UIN Sunan Gunung Djati Bandung.", link: "#tentang" },
+  { step: "DESTINATION 02", title: "Root & Values", desc: "Pelajari moto 'Tumbuh, Berkembang, Bersama', kode etika persma, serta prinsip independensi pemberitaan REAKSI.", link: "#tentang" },
+  { step: "DESTINATION 03", title: "Departments", desc: "Eksplorasi 3 departemen utama: Pimred, Litbang, dan Markom beserta bidang keahlian di dalamnya.", link: "#departemen" },
+  { step: "DESTINATION 04", title: "Our Works", desc: "Lihat karya nyata mulai dari portal berita harian redaksisaintek.com, e-paper, hingga pelatihan PJTD.", link: "#program" },
+  { step: "DESTINATION 05", title: "Join REAKSI", desc: "Temukan alur rekrutmen terbuka untuk menjadi bagian dari keluarga besar jurnalis LPM REAKSI FST UIN SGD Bandung.", link: "#bergabung" }
+];
+
+// Interactive Journey Map Function
+function setMapStop(index) {
+  const data = mapStops[index];
+  document.getElementById('map-step-label').textContent = data.step;
+  document.getElementById('map-title').textContent = data.title;
+  document.getElementById('map-desc').textContent = data.desc;
+  document.getElementById('map-btn').href = data.link;
+
+  document.querySelectorAll('.map-node').forEach((node, i) => {
+    if(i === index) node.classList.add('active');
+    else node.classList.remove('active');
+  });
+
+  document.querySelectorAll('.map-quick-links button').forEach((btn, i) => {
+    if(i === index) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+}
+
+// Department Modal Open/Close
+function openDeptModal(deptKey) {
+  const data = deptDetails[deptKey];
+  if (!data) return;
+
+  let fieldsHtml = data.fields.map(f => `
+    <div style="background: var(--light-blue); padding: 12px; border-radius: 8px; margin-top: 10px; border-left: 4px solid var(--primary-blue);">
+      <strong style="color: var(--deep-blue); font-family: var(--font-mono);">${f.name}</strong>
+      <p style="margin: 4px 0 0; font-size: 0.85rem; color: var(--ink-navy);">${f.task}</p>
+    </div>
+  `).join('');
+
+  document.getElementById('modal-body-content').innerHTML = `
+    <span class="stamp">${deptKey.toUpperCase()}</span>
+    <h2 style="margin-top: 10px; color: var(--deep-blue);">${data.title}</h2>
+    <p style="color: #4A607A; font-size: 0.95rem;">${data.desc}</p>
+    <h4 style="margin-top: 20px; color: var(--deep-blue); font-family: var(--font-mono);">Bidang & Divisi Kerja:</h4>
+    ${fieldsHtml}
+  `;
+
+  document.getElementById('dept-modal').classList.add('active');
+}
+function closeDeptModal() { document.getElementById('dept-modal').classList.remove('active'); }
+
+// Program Filtering
+function filterPrograms(dept, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.querySelectorAll('.program-card').forEach(card => {
+    if (dept === 'all' || card.dataset.dept === dept) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+// Lightbox Photo Modal
+function openLightbox(title, desc) {
+  document.getElementById('photo-modal-title').textContent = title;
+  document.getElementById('photo-modal-desc').textContent = desc;
+  document.getElementById('photo-modal').classList.add('active');
+}
+function closePhotoModal() { document.getElementById('photo-modal').classList.remove('active'); }
+
+// Reading Progress Indicator & Scroll Animations
+window.addEventListener('scroll', () => {
+  const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const scrolled = (winScroll / height) * 100;
+  document.getElementById('progress-bar').style.width = scrolled + '%';
+});
+
+// Reveal Elements on Scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Mobile Nav Menu Toggle
+document.getElementById('menu-toggle').addEventListener('click', () => {
+  document.getElementById('nav-menu').classList.toggle('open');
+});
+</script>
+
+</body>
+</html>
